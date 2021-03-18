@@ -1,0 +1,3 @@
+"Feature"	"Sequence"
+"O88990_peptide38"	"TINEVENQVLTR"
+"Q5SX40_peptide40"	"IAEQELLDASER"
