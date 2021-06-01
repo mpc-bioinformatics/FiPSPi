@@ -28,7 +28,7 @@
 ##########################################################################
 
 ### set path to current working directory
-cwd <- "C:/UNI/Publikationen/2021.XX.XX_writing_Britta_Eggers_Fasertypen/FiPSPi"
+cwd <- "C:/UNI/Publikationen/2021.06.XX_submitted_Britta_Eggers_Fasertypen/FiPSPi"
 
 ### set path to data file (relative path to the working directory specified above)
 data.path <- paste0(cwd, "/data/Murgia_et_al_data.txt")
@@ -120,23 +120,24 @@ classify.rf.evaluation <- function(iteration=NULL, trainset=NULL, testset=NULL, 
 #-----------------------------> Begin: Data Import & Pre-Processing
 
 dat <- read.table(data.path, sep="\t", header=TRUE, na.strings = "NA")
+colnames(dat) <- gsub("Type\\.I", "Type I", colnames(dat))
 
-label1 <- "T1" 
-#label2 <- "T2a"
-label3 <- "T2b"
-label4 <- "T2x"
+label1 <- "Type I" 
+#label2 <- "Type IIa"
+label3 <- "Type IIb"
+label4 <- "Type IIx"
 
 # Exclusion of 6 samples due to following criteria:
 # -	Samples without predominant Myh-isoform and/or without unambiguous fiber-type in the column 'Fiber type, renamed'
 # -	Samples with at least one missing value for the peptides to be validated
-# -	After the first two exclusion criteria group 'T2a' has only 3 samples --> group too small --> exclusion of complete group
+# -	After the first two exclusion criteria group 'Type IIa' has only 3 samples --> group too small --> exclusion of complete group
 # -	Samples with weakly predominant Myh-isoform and which were outliers in PCA
-dat <- dat[,-match(c("T1_9", "T2b_1", "T2b_3", "T2b_6", "T2x_5", "T2x_7"), colnames(dat))]
+dat <- dat[,-match(c("Type I_9", "Type IIb_1", "Type IIb_3", "Type IIb_6", "Type IIx_5", "Type IIx_7"), colnames(dat))]
 
-group1 <- grep("T1", colnames(dat), value=TRUE)
-#group2 <- grep("T2a", colnames(dat), value=TRUE)
-group3 <- grep("T2b", colnames(dat), value=TRUE)
-group4 <- grep("T2x", colnames(dat), value=TRUE)
+group1 <- grep("Type I_", colnames(dat), value=TRUE)
+#group2 <- grep("Type IIa_", colnames(dat), value=TRUE)
+group3 <- grep("Type IIb_", colnames(dat), value=TRUE)
+group4 <- grep("Type IIx_", colnames(dat), value=TRUE)
 n1 <- length(group1)
 #n2 <- length(group2)
 n3 <- length(group3)
@@ -206,7 +207,7 @@ for(i in 1:testruns){
                                    testset=dat[features,test.idx,drop=FALSE], 
                                    classes_train=as.factor(gsub("\\_\\d+", "", train.idx)), 
                                    classes_test=as.factor(gsub("\\_\\d+", "", test.idx)), 
-                                   label1="T1", label2="T2b", label3="T2x", output.path=NULL, 
+                                   label1="Type I", label2="Type IIb", label3="Type IIx", output.path=NULL, 
                                    nrounds = best.nrounds, max_depth = best.max_depth)
   perf.final[i,] <- classi
 }
@@ -220,9 +221,9 @@ write.table(perf.final, file = paste0(output.path, "/validation.txt"), row.names
 pca.dat <- dat[features,]
 
 group.vec <- c(
-  "T1",
-  "T2b",
-  "T2x"
+  "Type I",
+  "Type IIb",
+  "Type IIx"
 )
 
 col.vec <- c(
