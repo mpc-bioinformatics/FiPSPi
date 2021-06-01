@@ -21,7 +21,7 @@
 ##########################################################################
 
 ### set path to current working directory
-cwd <- "C:/UNI/Publikationen/2021.XX.XX_writing_Britta_Eggers_Fasertypen/FiPSPi"
+cwd <- "C:/UNI/Publikationen/2021.06.XX_submitted_Britta_Eggers_Fasertypen/FiPSPi"
 
 ### set path to data file (relative path to the working directory specified above)
 data.path <- paste0(cwd, "/data/Eggers_et_al_data.txt")
@@ -45,7 +45,7 @@ set.seed(1234)
 
 library(randomForest)
 library(ROCR)
-library(caret)
+#library(caret)
 library(rpart)
 library(rpart.plot)
 
@@ -292,7 +292,7 @@ rf.rfe <- function(iteration=NULL, datamatrix=NULL, output.path=NULL,
     #ACCURACY_total <- (ACCURACY1 + ACCURACY2 + ACCURACY3 + ACCURACY4) / 4 # total Accuracy
     SENSITIVITY_total <- (SENSITIVITY1 + SENSITIVITY2 + SENSITIVITY3 + SENSITIVITY4) / 4
     SPECIFICITY_total <- (SPECIFICITY1 + SPECIFICITY2 + SPECIFICITY3 + SPECIFICITY4) / 4
-    CM <- as.vector(t(confusion[,-ncol(confusion)]))  # Einträge der Confusion Matrix als Vector (zum Abspeichern)
+    CM <- as.vector(t(confusion[,-ncol(confusion)]))  # EintrÃ¤ge der Confusion Matrix als Vector (zum Abspeichern)
     
     
     
@@ -490,14 +490,14 @@ colnames(dat)[1:8] <- c("IsProteinGroupSpecific", "IsProteotypic", "StrippedSequ
 colnames(dat)[9:64] <- rownames(sampledat)
 
 
-label1 <- "T1" 
-label2 <- "T2a"
-label3 <- "T2B"
-label4 <- "T2x"
-group1 <- grep("T1", rownames(sampledat), value=TRUE)
-group2 <- grep("T2a", rownames(sampledat), value=TRUE)
-group3 <- grep("T2B", rownames(sampledat), value=TRUE)
-group4 <- grep("T2x", rownames(sampledat), value=TRUE)
+label1 <- "Type I" 
+label2 <- "Type IIa"
+label3 <- "Type IIb"
+label4 <- "Type IIx"
+group1 <- grep("Type I_", rownames(sampledat), value=TRUE)
+group2 <- grep("Type IIa_", rownames(sampledat), value=TRUE)
+group3 <- grep("Type IIb_", rownames(sampledat), value=TRUE)
+group4 <- grep("Type IIx_", rownames(sampledat), value=TRUE)
 n1 <- length(group1)
 n2 <- length(group2)
 n3 <- length(group3)
@@ -566,8 +566,8 @@ write.table(file=paste0(output.path, "/diff_analysis_output.txt"), x=diff.analys
 
 criterion <- "accuracy" #alternative criterion: specificity
 imp.measure <- "MDA"
-features <- rf.rfe(iteration=1, datamatrix=dat, output.path=output.path, label1="T1", 
-                   label2="T2a", label3="T2B", label4="T2x",  n1=n1, n2=n2, n3=n3, n4=n4,
+features <- rf.rfe(iteration=1, datamatrix=dat, output.path=output.path, label1="Type I", 
+                   label2="Type IIa", label3="Type IIb", label4="Type IIx",  n1=n1, n2=n2, n3=n3, n4=n4,
                    panel.selection.criterion=criterion, 
                    importance.measure=imp.measure, verbose=TRUE)
 selection.results <- cbind(features, descriptive.columns[features,"StrippedSequence"])
@@ -617,7 +617,7 @@ for(i in 1:testruns){
                                    testset=dat[features,test.idx,drop=FALSE], 
                                    classes_train=as.factor(gsub("\\_\\d+", "", train.idx)), 
                                    classes_test=as.factor(gsub("\\_\\d+", "", test.idx)), 
-                                   label1="T1", label2="T2a", label3="T2B", label4="T2x", output.path=NULL, 
+                                   label1="Type I", label2="Type IIa", label3="Type IIb", label4="Type IIx", output.path=NULL, 
                                    nrounds = best.nrounds, max_depth = best.max_depth)
   perf.final[i,] <- classi
 }
@@ -635,10 +635,10 @@ if(length(features) > 2){
 pca.dat <- dat
 
 group.vec <- c(
-  "T1",
-  "T2a",
-  "T2B",
-  "T2x"
+  "Type I",
+  "Type IIa",
+  "Type IIb",
+  "Type IIx"
 )
 
 col.vec <- c(
@@ -699,10 +699,10 @@ for (i in 1:2){
 pca.dat <- dat[features,]
 
 group.vec <- c(
-  "T1",
-  "T2a",
-  "T2B",
-  "T2x"
+  "Type I",
+  "Type IIa",
+  "Type IIb",
+  "Type IIx"
 )
 
 col.vec <- c(
@@ -764,7 +764,7 @@ for(i in 1:length(features)){
   seq <- descriptive.columns2[descriptive.columns2[,1] == features[i],2]
   current.p.value <- formatC(p.values.adj[idx], format = "e", digits = 2)
   png(paste0(output.path,"/boxplot_", i, "_", features[i], ".png"), width=2000, height=2000, pointsize=15, res=300)
-  boxplot(dat[features[i],group1], dat[features[i],group2], dat[features[i],group3], dat[features[i],group4], main=paste0(seq, "\np-value: ", current.p.value), names=c(label1, label2, label3, label4), col=col.vec[1:4], cex.axis=1.5, cex.main=1.5)
+    boxplot(dat[features[i],group1], dat[features[i],group2], dat[features[i],group3], dat[features[i],group4], main=paste0(seq, "\np-value: ", current.p.value), names=c(label1, label2, label3, label4), col=col.vec[1:4], cex.axis=1.25, cex.main=1.5)
   dev.off()
 }
 
